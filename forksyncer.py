@@ -32,11 +32,11 @@ def sync_branch(repo, branch_name):
 	if comparison.ahead_by > 0:
 		old_branch_name = branch_name + timey()
 		print(f"{repo.name} syncing {branch_name}. commits AHEAD by: {comparison.ahead_by}. moving to {old_branch_name}")
-		create_branch(repo, old_branch_name, comparison.merge_base_commit.sha)
+		create_branch(repo, old_branch_name, repo.get_branch(branch_name).commit.sha)
 
-	if comparison.behind_by > 0:
+	if comparison.behind_by > 0 or comparison.ahead_by > 0:
 		ref = repo.get_git_ref(f"heads/{branch_name}")
-		print(f"{repo.name} syncing {branch_name}. commits behind by: {comparison.behind_by}")
+		print(f"{repo.name} syncing {branch_name}. behind by: {comparison.behind_by}. ahead by {comparison.ahead_by}")
 		ref.edit(comparison.base_commit.sha, force=True)
 
 def main():
