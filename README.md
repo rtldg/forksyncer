@@ -1,8 +1,8 @@
 fork syncing script
 
-create a github Personal Access Token at https://github.com/settings/tokens with all permissions for "repo" and drop in into access_token.secret
+create a github Personal Access Token at https://github.com/settings/tokens with all permissions for "repo" and drop in into the file 'access_token.secret'
 
-this will probably start a lot of annoying workflow shit... there's no api call afaik to disable workflows on a repo so you probably want to work the repo AND THEN disable actions on the repo... https://github.com/EXAMPLE/REPO/settings/actions AND THEN run the script...
+this will probably start a lot of annoying workflow shit... there's no api call afaik to disable workflows on a repo so you probably want to fork the repo AND THEN disable actions on the repo... https://github.com/EXAMPLE/REPO/settings/actions AND THEN run the script...
 
 example:
 ```
