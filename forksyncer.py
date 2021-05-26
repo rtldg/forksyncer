@@ -6,6 +6,7 @@
 
 import github
 import datetime
+import os
 
 def create_branch(repo, branch_name, sha):
 	repo.create_git_ref("refs/heads/"+branch_name, sha)
@@ -40,9 +41,7 @@ def sync_branch(repo, branch_name):
 		ref.edit(comparison.base_commit.sha, force=True)
 
 def main():
-	g = None
-	with open("access_token.secret", "r") as f:
-		g = github.Github(f.read().strip())
+	g = github.Github(os.environ["GH_ACCESS_TOKEN"])
 
 	for repo in g.get_user().get_repos():
 		#if repo.name != "PKHeX": # test repo...
