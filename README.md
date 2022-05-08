@@ -1,12 +1,14 @@
-fork syncing script
-
+## fork syncing scripts
 create a github Personal Access Token at https://github.com/settings/tokens with all permissions for "repo" and then use that token as `GH_ACCESS_TOKEN=token python3 forksyncer.py`
 
-this will probably start a lot of annoying workflow shit... there's no api call afaik to disable workflows on a repo so you probably want to fork the repo AND THEN disable actions on the repo... https://github.com/EXAMPLE/REPO/settings/actions AND THEN run the script...
+these syncers will probably start a lot of annoying workflow shit... there's no api call afaik to disable workflows on a repo so you probably want to fork the repo AND THEN disable actions on the repo... https://github.com/EXAMPLE/REPO/settings/actions AND THEN run the script...
+
+## v1
+a fork syncer that only uses the github api
 
 example:
 ```
-$ python3 forksyncer.py
+$ GH_ACCESS_TOKEN=asdf python3 forksyncer.py
 Emu-Docs syncing master. commits AHEAD by: 29. moving to master_20210224_204839
 FormatMii syncing master. commits AHEAD by: 1. moving to master_20210224_204849
 NTRViewer syncing master. commits AHEAD by: 16. moving to master_20210224_204954
@@ -28,3 +30,19 @@ XCI-Explorer syncing master. commits behind by: 29
 xyzzy-mod syncing master. commits behind by: 7
 yuzu syncing master. commits behind by: 7094
 ```
+
+
+## v2
+
+goals:
+- fork repos and update branches on github
+	- fork wiki repos too
+- locally store repos (.git only (git clone --mirror?))
+- meta info repo of latest updates & log of changes.
+	- log of changes is a hardlinked file into locally store repo folders too
+	- pretty list of the latest changes
+	- to be stored at https://github.com/PMArkive/PMArkive
+- scrape issues, prs, tags, and releases
+	- stored as json & hardlinked like log files
+- use network graph & forks pages to automatically scrape forks?
+- log remote fetch info and branch diffs each forksync

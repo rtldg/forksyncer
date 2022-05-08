@@ -1,7 +1,7 @@
 """
 MIT License
 
-Copyright (c) 2021 rtldg
+Copyright (c) 2022 rtldg
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,10 +23,6 @@ SOFTWARE.
 """
 
 # Github fork syncer thing...
-
-# pip3 install PyGithub
-# echo accesstoken >> access_token.secret
-# python3 forksyncer.py
 
 import github
 import datetime
