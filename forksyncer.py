@@ -67,9 +67,18 @@ def sync_branch(repo, branch_name):
 def main():
 	g = github.Github(os.environ["GH_ACCESS_TOKEN"])
 
+	skip = True
 	for repo in g.get_user().get_repos():
 		#if repo.name != "PKHeX": # test repo...
 		#	continue
+
+		"""
+		if repo.name == "gcadapter-evdev":
+			skip = False
+		if skip:
+			continue
+		"""
+
 		if repo.parent == None:
 			continue
 
