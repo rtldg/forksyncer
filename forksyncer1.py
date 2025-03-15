@@ -22,6 +22,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
+# /// script
+# dependencies = [
+#   "PyGithub",
+# ]
+# ///
+
 # Github fork syncer thing...
 
 import github
@@ -51,6 +57,9 @@ def sync_branch(repo, branch_name):
 		return
 
 	if comparison.ahead_by > 0:
+		if True:
+			print(f"we're ahead by {comparison.ahead_by} in {repo.name}/{branch_name} so maybe the parent was deleted?")
+			return
 		old_branch_name = branch_name + timey()
 		print(f"{repo.name} syncing {branch_name}. commits AHEAD by: {comparison.ahead_by}. moving to {old_branch_name}")
 		create_branch(repo, old_branch_name, repo.get_branch(branch_name).commit.sha)
@@ -65,11 +74,11 @@ def main():
 
 	skip = True
 	for repo in g.get_user().get_repos():
-		#if repo.name != "PKHeX": # test repo...
+		#if repo.name != "BombSiteLimiter": # test repo...
 		#	continue
 
 		"""
-		if repo.name == "gcadapter-evdev":
+		if repo.name == "ctrulib":
 			skip = False
 		if skip:
 			continue
@@ -79,8 +88,12 @@ def main():
 			continue
 
 		my_branches = {}
-		for branch in repo.get_branches():
-			my_branches[branch.name] = branch
+		try:
+			for branch in repo.get_branches():
+				my_branches[branch.name] = branch
+		except:
+			print(f"branches from {repo.name} are fucked? skipping")
+			continue
 
 		for branch in repo.parent.get_branches():
 			if branch.name in my_branches:

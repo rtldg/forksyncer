@@ -30,27 +30,40 @@ import datetime
 from pathlib import Path
 import git
 import github
+import pdb
+
+# https://gitpython.readthedocs.io/en/stable/index.html
+# https://pygithub.readthedocs.io/en/latest/index.html
 
 class MyProgressPrinter(git.RemoteProgress):
 	def update(self, op_code, cur_count, max_count=None, message=''):
 		print(op_code, cur_count, max_count, cur_count / (max_count or 100.0), message or "NO MESSAGE")
 
-def handle_remote(meta, repo, remote):
+def handle_remote(repo, remote):
 	# check if valid remote...
 
-	"""
-	for fetch_info in remote.fetch(progress=MyProgressPrinter()):
+	for fetch_info in remote.fetch(): #progress=MyProgressPrinter()):
 		print("Updated %s to %s" % (fetch_info.ref, fetch_info.commit))
-	"""
 
 	"""
-	if not repo.name.endswith(".wiki.git"):
+	if not repo.name.endswith(".wiki"):
 		ghrepo = gh.get_repo()
-		scrape_issues(meta, repo, ghrepo)
-		scrape_releases(meta, repo, ghrepo)
+		scrape_issues(repo, ghrepo)
+		scrape_releases(repo, ghrepo)
 	"""
 
-def scrape_issues(meta, localrepo, ghrepo):
+	"""
+	commits_behind = repo.iter_commits('master..origin/master')
+	commits_ahead = repo.iter_commits('origin/master..master')
+	count = sum(1 for c in commits_ahead)
+	"""
+
+	"""
+	commits_diff = repo.git.rev_list('--left-right', '--count', f'{branch}...{branch}@{{u}}')
+	num_ahead, num_behind = commits_diff.split('\t')
+	"""
+
+def scrape_issues(localrepo, ghrepo):
 	lastscrapedate = None
 	issues = ghrepo.get_issues(
 		state='all',
@@ -59,22 +72,48 @@ def scrape_issues(meta, localrepo, ghrepo):
 	)
 
 def main():
-	#GH_ACCESS_TOKEN = os.environ["GH_ACCESS_TOKEN"]
+	GH_ACCESS_TOKEN = os.environ["GH_ACCESS_TOKEN"]
 	ARK_META_REPO = os.environ["ARK_META_REPO"]
 	ARK_STORAGE_DIR = os.environ["ARK_STORAGE_DIR"]
+	GITHUB_HOST = os.environ["GITHUB_HOST"]
 
 	Path(ARK_STORAGE_DIR).mkdir(parents=True, exist_ok=True)
 	Path(ARK_META_REPO + "/meta").mkdir(parents=True, exist_ok=True)
 
-	#gh = github.Github(GH_ACCESS_TOKEN)
+	gh = github.Github(GH_ACCESS_TOKEN)
+	username = gh.get_user().login
+	storage = Path(ARK_STORAGE_DIR)
 
-	for f in Path(ARK_STORAGE_DIR).iterdir():
+	for ghrepo in gh.get_user().get_repos():
+		folder = storage / ghrepo.name
+		if folder.exists():
+			continue
+
+		print(f"cloning {username}/{ghrepo.name}")
+		arkrepo = git.Repo.clone_from(
+			f"git@{GITHUB_HOST}:{username}/{ghrepo.name}.git",
+			folder,
+			multi_options=[],
+			no_single_branch=True,
+			#progress=MyProgressPrinter(), # print spam
+			mirror=True
+		)
+
+		if ghrepo.fork:
+			print(f"  adding remote {ghrepo.parent.owner.login}_{ghrepo.parent.name}")
+			arkrepo.create_remote(f"{ghrepo.parent.owner.login}_{ghrepo.parent.name}", ghrepo.parent.clone_url)
+			if ghrepo.source != ghrepo.parent:
+				print(f"  adding remote {ghrepo.source.owner.login}_{ghrepo.source.name}")
+				arkrepo.create_remote(f"{ghrepo.source.owner.login}_{ghrepo.source.name}", ghrepo.source.clone_url)
+
+	#pdb.set_trace()
+
+	for f in storage.iterdir():
 		if not f.is_dir():
 			continue
 		repo = git.Repo(f) # need to catch git.exc.InvalidGitRepositoryError
-		print(repo)
 		for remote in repo.remotes:
-			handle_remote(meta, repo, remote)
+			handle_remote(repo, remote)
 
 
 if __name__ == "__main__":
