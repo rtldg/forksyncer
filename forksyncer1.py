@@ -97,7 +97,7 @@ def main():
 
 		parent_branches = []
 		try:
-			parent_branches = repo.parent.get_branches()
+			parent_branches = [branch for branch in repo.parent.get_branches()]
 		except:
 			print(f"parent_branches from {repo.name} are fucked?")
 			continue;
