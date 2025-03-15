@@ -77,12 +77,12 @@ def main():
 		#if repo.name != "BombSiteLimiter": # test repo...
 		#	continue
 
-		"""
-		if repo.name == "ctrulib":
+		#"""
+		if repo.name == "Open-Fortress-Content-Source":
 			skip = False
 		if skip:
 			continue
-		"""
+		#"""
 
 		if repo.parent == None:
 			continue
@@ -95,7 +95,14 @@ def main():
 			print(f"branches from {repo.name} are fucked? skipping")
 			continue
 
-		for branch in repo.parent.get_branches():
+		parent_branches = []
+		try:
+			parent_branches = repo.parent.get_branches()
+		except:
+			print(f"parent_branches from {repo.name} are fucked?")
+			continue;
+
+		for branch in parent_branches:
 			if branch.name in my_branches:
 				sync_branch(repo, branch.name)
 			else:
