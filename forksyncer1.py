@@ -78,13 +78,17 @@ def main():
 		#	continue
 
 		#"""
-		if repo.name == "Open-Fortress-Content-Source":
+		if repo.name == "SuppressViewpunch":
 			skip = False
 		if skip:
 			continue
 		#"""
 
-		if repo.parent == None:
+		try:
+			if repo.parent == None:
+				continue
+		except github.GithubException as ex:
+			print(f"failed to fetch repo.parent on {repo.name} (status = {ex.status})")
 			continue
 
 		my_branches = {}
