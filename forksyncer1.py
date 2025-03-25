@@ -69,18 +69,13 @@ def sync_branch(repo, branch_name):
 		print(f"{repo.name} syncing {branch_name}. behind by: {comparison.behind_by}. ahead by {comparison.ahead_by}")
 		ref.edit(comparison.base_commit.sha, force=True)
 
-def iter_repos(g, repos):
-	skip = True
+def iter_repos(g, repos, skip_till):
+	skip = skip_till != ""
 	for repo in repos:
-		#if repo.name != "BombSiteLimiter": # test repo...
-		#	continue
-
-		"""
-		if repo.name == "SuppressViewpunch":
+		if repo.name == skip_till:
 			skip = False
 		if skip:
 			continue
-		"""
 
 		try:
 			if repo.parent == None:
@@ -116,8 +111,10 @@ def main():
 		with open("../forksyncertoken.secret") as f:
 			os.environ["GH_ACCESS_TOKEN"] = f.read().strip()
 	g = github.Github(os.environ["GH_ACCESS_TOKEN"])
-	iter_repos(g, g.get_organization("eatjelly").get_repos())
-	iter_repos(g, g.get_user().get_repos())
+	skip_till = "HyoutaTools"
+	if skip_till == "":
+		iter_repos(g, g.get_organization("eatjelly").get_repos(), skip_till)
+	iter_repos(g, g.get_user().get_repos(), skip_till)
 
 if __name__ == "__main__":
 	main()
