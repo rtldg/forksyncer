@@ -69,20 +69,18 @@ def sync_branch(repo, branch_name):
 		print(f"{repo.name} syncing {branch_name}. behind by: {comparison.behind_by}. ahead by {comparison.ahead_by}")
 		ref.edit(comparison.base_commit.sha, force=True)
 
-def main():
-	g = github.Github(os.environ["GH_ACCESS_TOKEN"])
-
+def iter_repos(g, repos):
 	skip = True
-	for repo in g.get_user().get_repos():
+	for repo in repos:
 		#if repo.name != "BombSiteLimiter": # test repo...
 		#	continue
 
-		#"""
+		"""
 		if repo.name == "SuppressViewpunch":
 			skip = False
 		if skip:
 			continue
-		#"""
+		"""
 
 		try:
 			if repo.parent == None:
@@ -112,6 +110,14 @@ def main():
 			else:
 				print(f"{repo.name} creating new branch {branch.name} at {branch.commit.sha}")
 				create_branch(repo, branch.name, branch.commit.sha)
+
+def main():
+	if not "GH_ACCESS_TOKEN" in os.environ:
+		with open("../forksyncertoken.secret") as f:
+			os.environ["GH_ACCESS_TOKEN"] = f.read().strip()
+	g = github.Github(os.environ["GH_ACCESS_TOKEN"])
+	iter_repos(g, g.get_organization("eatjelly").get_repos())
+	iter_repos(g, g.get_user().get_repos())
 
 if __name__ == "__main__":
 	main()
