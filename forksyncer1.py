@@ -111,10 +111,38 @@ def main():
 		with open("../forksyncertoken.secret") as f:
 			os.environ["GH_ACCESS_TOKEN"] = f.read().strip()
 	g = github.Github(os.environ["GH_ACCESS_TOKEN"])
-	skip_till = "HyoutaTools"
+	if False:
+		disable_all_actions(g)
+		return
+	skip_till = ""
 	if skip_till == "":
 		iter_repos(g, g.get_organization("eatjelly").get_repos(), skip_till)
 	iter_repos(g, g.get_user().get_repos(), skip_till)
+
+def disable_all_actions(g):
+	last_actions_disable = datetime.datetime(2025,3,25)
+	login = g.get_user().login
+	skip = True
+	for repo in g.get_user().get_repos():
+		"""
+		if repo.name == "SurfReplays":
+			skip = False
+		if skip:
+			continue
+		"""
+		#"""
+		if repo.created_at < last_actions_disable:
+			continue
+		#"""
+		# TODO: repo.full_name (but also don't nuke org repo actions elsewhere...)
+		print(f"/repos/{login}/{repo.name}/actions/permissions")
+		try:
+			j = g.requester.requestJson("PUT", f"/repos/{login}/{repo.name}/actions/permissions", input={"enabled": False})
+			if j[0] != 204:
+				print(j)
+		except Exception as e:
+			print(e)
+			print("  bad for some reason... continuing though...")
 
 if __name__ == "__main__":
 	main()
