@@ -116,7 +116,7 @@ def main():
 		return
 	skip_till = ""
 	if skip_till == "":
-		iter_repos(g, g.get_organization("eatjelly").get_repos(), skip_till)
+		iter_repos(g, g.get_organization("PMArkive2").get_repos(), skip_till)
 	iter_repos(g, g.get_user().get_repos(), skip_till)
 
 def disable_all_actions(g):
